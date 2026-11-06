@@ -118,7 +118,7 @@ package extension EngineKeychainStore {
         service: String,
         accessGroup: String? = nil,
         logger: any EngineScopedLogger
-    ) -> KeychainItemStore {
+    ) -> any KeychainItemStoreBehavior {
         let log = logger.scoped(logScope)
         let attributes = KeychainStoreAttributes(service: service, accessGroup: accessGroup)
         log.verbose(
@@ -126,7 +126,7 @@ package extension EngineKeychainStore {
             "attributes=\(attributes), " +
             "accessGroup=\(attributes.accessGroup ?? "No access group specified")"
         )
-        return KeychainItemStore(attributes: attributes.itemAttributes, logger: log)
+        return FileKeychainItemStore(attributes: attributes.itemAttributes, logger: log)
     }
 
     /// `store`, but logging everything at verbose level when it is a production `KeychainItemStore`:
@@ -139,7 +139,7 @@ package extension EngineKeychainStore {
         }
         // Rebuilt with `.system` `SecItem` calls: a test's `SecItemCalls` seam is not carried over, which only
         // tests could notice.
-        return KeychainItemStore(attributes: itemStore.attributes, logger: VerboseOnlyLogger(logger.scoped(logScope)))
+        return FileKeychainItemStore(attributes: itemStore.attributes, logger: VerboseOnlyLogger(logger.scoped(logScope)))
     }
 }
 

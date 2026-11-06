@@ -79,7 +79,7 @@ final class LazyUserPoolAnalytics: UserPoolAnalyticsBehavior, @unchecked Sendabl
     /// `UserDefaults.standard`, and the user domain's Application Support directory.
     init(
         pinpointAppId: String?,
-        keychain: any KeychainItemStoreBehavior = KeychainItemStore(
+        keychain: any KeychainItemStoreBehavior = FileKeychainItemStore(
             service: LazyUserPoolAnalytics.pinpointContextService,
             logger: ClientLog.logger(ClientLog.keychainItemStore)
         ),

@@ -210,8 +210,8 @@ public struct KeychainStore: KeychainStoreBehavior {
 
     /// The shared implementation every member delegates to. Built per call from `attributes` rather than
     /// stored, and logging through `KeychainStore.log` as it always has.
-    var itemStore: KeychainItemStore {
-        KeychainItemStore(attributes: attributes.itemAttributes, logger: AmplifyLoggerBridge<KeychainStore>())
+    var itemStore: any KeychainItemStoreBehavior {
+        FileKeychainItemStore(attributes: attributes.itemAttributes, logger: AmplifyLoggerBridge<KeychainStore>())
     }
 
     /// What every member actually operates on: the injected store in tests, `itemStore` otherwise.
@@ -225,7 +225,7 @@ public struct KeychainStore: KeychainStoreBehavior {
     var quietBackingStore: any KeychainItemStoreBehavior {
         // A rebuilt store, so it uses `.system` `SecItem` calls, as `itemStore` does: only an injected store
         // (a test's) is passed through.
-        injectedItemStore ?? KeychainItemStore(
+        injectedItemStore ?? FileKeychainItemStore(
             attributes: attributes.itemAttributes,
             logger: VerboseOnlyLogger(AmplifyLoggerBridge<KeychainStore>())
         )

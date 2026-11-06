@@ -115,7 +115,7 @@ struct SessionRecordStore: Sendable {
     init(namespace: SessionStorageNamespace) {
         self.init(
             namespace: namespace,
-            keychain: KeychainItemStore(
+            keychain: FileKeychainItemStore(
                 service: Self.service(forAccessGroup: namespace.accessGroup),
                 accessGroup: namespace.accessGroup,
                 logger: ClientLog.logger(ClientLog.keychainItemStore)

@@ -41,7 +41,7 @@ package extension KeychainItemAttributes {
         var query: [String: Any] = [
             KeychainConstants.Class: itemClass,
             KeychainConstants.AttributeService: service,
-            KeychainConstants.UseDataProtectionKeyChain: kCFBooleanTrue as Any
+            KeychainConstants.UseDataProtectionKeyChain: kCFBooleanFalse as Any
         ]
 
         if let accessGroup {
@@ -54,7 +54,7 @@ package extension KeychainItemAttributes {
     func defaultSetQuery() -> [String: Any] {
         var query: [String: Any] = defaultGetQuery()
         query[KeychainConstants.AttributeAccessible] = KeychainConstants.AttributeAccessibleAfterFirstUnlockThisDeviceOnly
-        query[KeychainConstants.UseDataProtectionKeyChain] = kCFBooleanTrue
+        query[KeychainConstants.UseDataProtectionKeyChain] = kCFBooleanFalse
         return query
     }
 

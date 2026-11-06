@@ -30,7 +30,7 @@ package extension KeychainItemStore {
     static func listServicesQuery() -> [String: Any] {
         [
             KeychainConstants.Class: KeychainConstants.ClassGenericPassword,
-            KeychainConstants.UseDataProtectionKeyChain: kCFBooleanTrue as Any,
+            KeychainConstants.UseDataProtectionKeyChain: kCFBooleanFalse as Any,
             KeychainConstants.MatchLimit: KeychainConstants.MatchLimitAll,
             KeychainConstants.ReturnAttributes: kCFBooleanTrue as Any
         ]

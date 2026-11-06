@@ -421,7 +421,7 @@ extension SessionRecordStore {
             try KeychainItemStore.allServices(logger: ClientLog.logger(ClientLog.keychainItemStore))
         },
         makeStore: (String) -> any KeychainItemStoreBehavior = {
-            KeychainItemStore(service: $0, logger: ClientLog.logger(ClientLog.keychainItemStore))
+            FileKeychainItemStore(service: $0, logger: ClientLog.logger(ClientLog.keychainItemStore))
         }
     ) -> [any KeychainItemStoreBehavior] {
         var services = legacyLoginServices(for: pools)

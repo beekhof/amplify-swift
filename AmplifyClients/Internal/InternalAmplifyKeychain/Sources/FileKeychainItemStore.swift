@@ -271,21 +271,38 @@ package struct FileKeychainItemStore: KeychainItemStoreBehavior {
         try? fm.setAttributes([.posixPermissions: 0o700], ofItemAtPath: directory.path)
     }
 
-    /// Atomic write: temp file in the same directory, 0600, rename into
-    /// place. The rename is atomic within the directory, and the 0700 parent
-    /// keeps the temp file unreachable by other users while it briefly
-    /// carries the default 0644 mode.
+    /// Atomic write: temp file in the same directory, 0600, then `rename(2)`
+    /// into place. The rename is atomic within the directory and — unlike
+    /// `FileManager.moveItem`, which refuses to touch an existing destination
+    /// (NSCocoaErrorDomain 516 / POSIX EEXIST) — replaces the destination if
+    /// an item is already there, which is the overwrite semantics `set` needs.
+    /// The 0700 parent keeps the temp file unreachable by other users while it
+    /// briefly carries the default 0644 mode.
     private func writeFile(_ value: Data, to file: URL) throws {
         let fm = FileManager.default
         let tmp = directory.appendingPathComponent(".tmp-\(UUID().uuidString)")
         do {
             try value.write(to: tmp, options: .atomic)
             try fm.setAttributes([.posixPermissions: 0o600], ofItemAtPath: tmp.path)
-            try fm.moveItem(at: tmp, to: file)
+            try renameFile(at: tmp, to: file)
         } catch {
             try? fm.removeItem(at: tmp)
             logger.error("[FileKeychainItemStore] Failed writing \(file.path): \(error)")
             throw KeychainAccessError.unknown("Failed writing \(file.path)", error)
+        }
+    }
+
+    /// `rename(2)` within a single volume: atomic, and — unlike
+    /// `FileManager.moveItem` — replaces an existing destination file rather
+    /// than failing with EEXIST. `source` and `destination` always share the
+    /// store's directory, so a cross-device (EXDEV) error is not possible.
+    private func renameFile(at source: URL, to destination: URL) throws {
+        if rename(source.path, destination.path) != 0 {
+            let code = Int(errno)
+            throw KeychainAccessError.unknown(
+                "rename \(source.lastPathComponent) -> \(destination.lastPathComponent) failed (POSIX \(code))",
+                NSError(domain: NSPOSIXErrorDomain, code: code)
+            )
         }
     }
 
